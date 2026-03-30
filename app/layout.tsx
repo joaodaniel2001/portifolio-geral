@@ -2,10 +2,11 @@ import { Inter, JetBrains_Mono, Keania_One, Geist } from "next/font/google";
 import "./globals.css";
 import { ReactNode } from "react";
 import { Header } from "./components/header";
-import { Particles } from "./components/ui/particles";
-import { cn } from "@/lib/utils";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+import { cn } from "@/lib/utils";
+import { Particles } from "@/components/ui/particles";
+
+const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
 const inter = Inter({
   variable: "--font-inter",
@@ -28,7 +29,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       lang="pt-BR"
-      className={cn(inter.variable, jetbrainsMono.variable, keaniaOne.variable, "font-sans", geist.variable)}
+      className={cn(
+        inter.variable,
+        jetbrainsMono.variable,
+        keaniaOne.variable,
+        "font-sans",
+        geist.variable,
+      )}
     >
       <body className={`bg-[#07111f] text-gray-100 antialiased min-h-screen`}>
         {/* BackGround de Particulas */}

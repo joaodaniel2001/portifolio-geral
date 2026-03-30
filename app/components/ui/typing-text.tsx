@@ -2,7 +2,6 @@
 
 import { gsap } from "gsap";
 import {
-  createElement,
   type ElementType,
   useCallback,
   useEffect,
@@ -65,8 +64,10 @@ const TypingText = ({
 
   const textArray = useMemo(() => (Array.isArray(text) ? text : [text]), [text]);
 
+  // CORREÇÃO: Usamos requestAnimationFrame para evitar o erro de setState síncrono no mount
   useEffect(() => {
-    setIsMounted(true);
+    const frame = requestAnimationFrame(() => setIsMounted(true));
+    return () => cancelAnimationFrame(frame);
   }, []);
 
   const getRandomSpeed = useCallback(() => {
@@ -83,10 +84,8 @@ const TypingText = ({
   useEffect(() => {
     if (!(startOnVisible && containerRef.current)) return;
     const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) setIsVisible(true);
-        });
+      ([entry]) => {
+        if (entry.isIntersecting) setIsVisible(true);
       },
       { threshold: 0.1 }
     );
@@ -111,10 +110,10 @@ const TypingText = ({
     if (!isVisible || !isMounted) return;
 
     let timeout: NodeJS.Timeout;
-    const currentText = textArray[currentTextIndex];
+    const currentFullText = textArray[currentTextIndex];
     const processedText = reverseMode
-      ? currentText.split("").reverse().join("")
-      : currentText;
+      ? currentFullText.split("").reverse().join("")
+      : currentFullText;
 
     const executeAnimation = () => {
       if (isDeleting) {
@@ -134,15 +133,11 @@ const TypingText = ({
           setCurrentCharIndex((prev) => prev + 1);
         }, variableSpeed ? getRandomSpeed() : typingSpeed);
       } else {
-        // AQUI: Dispara o evento assim que termina de escrever
         if (onSentenceComplete) {
-          onSentenceComplete(currentText, currentTextIndex);
+          onSentenceComplete(currentFullText, currentTextIndex);
         }
-
         if (textArray.length > 1 || loop) {
-          timeout = setTimeout(() => {
-            setIsDeleting(true);
-          }, pauseDuration);
+          timeout = setTimeout(() => setIsDeleting(true), pauseDuration);
         }
       }
     };
@@ -160,32 +155,36 @@ const TypingText = ({
     isMounted, reverseMode, variableSpeed, onSentenceComplete, getRandomSpeed
   ]);
 
-  if (!isMounted) return <Component className={className} {...props}>&nbsp;</Component>;
-
+  const currentText = textArray[currentTextIndex];
   const shouldHideCursor = hideCursorWhileTyping && (currentCharIndex < currentText.length || isDeleting);
 
-  return createElement(
-    Component,
-    {
-      ref: containerRef,
-      className: `inline-block whitespace-pre-wrap tracking-tight ${className}`,
-      ...props,
-    },
-    <span className="inline" style={{ color: getCurrentTextColor() }}>
-      {displayedText}
-    </span>,
-    showCursor && (
-      <span
-        ref={cursorRef}
-        className={`inline-block ${shouldHideCursor ? "opacity-0" : "opacity-100"} ${
-          cursorCharacter === "|"
-            ? `h-[1em] w-[2px] translate-y-[15%] bg-current ${cursorClassName}`
-            : `ml-1 ${cursorClassName}`
-        }`}
-      >
-        {cursorCharacter === "|" ? "" : cursorCharacter}
+  if (!isMounted) return <Component className={className} {...props}>&nbsp;</Component>;
+
+  // CORREÇÃO: Atribuir a Component para DynamicTag resolve o erro de "access refs during render"
+  const DynamicTag = Component;
+
+  return (
+    <DynamicTag
+      ref={containerRef}
+      className={`inline-block whitespace-pre-wrap tracking-tight ${className}`}
+      {...props}
+    >
+      <span className="inline" style={{ color: getCurrentTextColor() }}>
+        {displayedText}
       </span>
-    )
+      {showCursor && (
+        <span
+          ref={cursorRef}
+          className={`inline-block ${shouldHideCursor ? "opacity-0" : "opacity-100"} ${
+            cursorCharacter === "|"
+              ? `h-[1em] w-[2px] translate-y-[15%] bg-current ${cursorClassName}`
+              : `ml-1 ${cursorClassName}`
+          }`}
+        >
+          {cursorCharacter === "|" ? "" : cursorCharacter}
+        </span>
+      )}
+    </DynamicTag>
   );
 };
 
