@@ -25,6 +25,11 @@ const keaniaOne = Keania_One({
   weight: "400",
 });
 
+export const metadata = {
+  title: "João Daniel - FullStack",
+  description: "",
+};
+
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
