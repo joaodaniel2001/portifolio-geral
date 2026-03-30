@@ -1,0 +1,26 @@
+[
+  {
+    "title": "Personal Portfolio",
+    "description": "The very website you are browsing right now.",
+    "tags": ["TypeScript", "JavaScript", "CSS"],
+    "category": "web",
+    "image": "/portifolio.png",
+    "to": "https://github.com/joaodaniel2001/portifolio-geral"
+  },
+  {
+    "title": "JKG Project",
+    "description": "Web system tracking real-time student entry, exit, and campus security.",
+    "tags": ["Node","JavaScript"],
+    "category": "web",
+    "image": "/projeto-jkg.png",
+    "to": "https://github.com/joaodaniel2001/Projeto-JKG"
+  },
+  {
+    "title": "Animal Game",
+    "description": "High-school roulette game where players bet to win virtual currency.",
+    "tags": ["HTML", "CSS", "JavaScript"],
+    "category": "web",
+    "image": "/jogo-do-bixo.png",
+    "to": "https://github.com/joaodaniel2001/jogo_do_bixo"
+  }
+]
